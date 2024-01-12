@@ -10,7 +10,7 @@ import SwiftUI
 struct ContentView: View {
     
     // Available unit to switch between
-    enum CountDownUnit: String{
+    private enum CountDownUnit: String{
         case day = "Day"
         case month = "Month"
         case year = "Year"
@@ -18,8 +18,8 @@ struct ContentView: View {
     
     // our current time
     @State private var currentTime = Date() // The current Date reference to be contiusly updated
-    let timer = Timer.publish(every: 0.1, on: .main, in: .common).autoconnect() // Timer for updating the count
-    var calendar = Calendar.current // reference to the user timezone
+    private let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect() // Timer for updating the count
+     private var calendar = Calendar.current // reference to the user timezone
     
     // Reference to save the users selected time unit
     @State @AppStorage("Selected Count Down Unit") private var selectedCountDownUnitRaw: String = "Day"
@@ -41,7 +41,6 @@ struct ContentView: View {
                 guard let startOfNextDay = calendar.date(byAdding: .day, value: 1, to: startOfToday) else {
                     fatalError("Unable to find the start of the next day.")
                 }
-//                print("The start of the next day is \(startOfToday)")
                 return startOfNextDay
                 
             case .month:
@@ -51,7 +50,6 @@ struct ContentView: View {
                 guard let startOfNextMonth = calendar.date(byAdding: .month, value: 1, to: startOfThisMonth) else {
                     fatalError("Unable to calculate the start of the next month.")
                 }
-//                print("The start of next month is \(startOfNextMonth)")
                 return startOfNextMonth
                 
             case .year:
@@ -62,26 +60,25 @@ struct ContentView: View {
                 guard let startOfNextYear = calendar.date(byAdding: .year, value: 1, to: startOfThisYear) else {
                     fatalError("Unable to calculate the start of the next year.")
                 }
-//                print("Start of the next year is \(startOfNextYear)")
                 return startOfNextYear
             }
         }
     }
     
     // Data type to contain the remaining time
-    private struct RemaniningTime{
+    private struct RemainingTime{
         var seconds: Int = 0
         var minutes: Int = 0
         var hours: Int = 0
         var days: Int = 0
-        var month: Int = 0
+        var months: Int = 0
         
-        init(seconds: Int, minutes: Int, hours: Int, days: Int, month: Int) {
+        init(seconds: Int, minutes: Int, hours: Int, days: Int, months: Int) {
             self.seconds = seconds
             self.minutes = minutes
             self.hours = hours
             self.days = days
-            self.month = month
+            self.months = months
         }
     }
     
@@ -105,7 +102,6 @@ struct ContentView: View {
                         .border(Color.white, width: 1)
                 }
             }
-            //.background(Color.blue.opacity(0.3)) // For debugging
             
             let remainingTime = CalcRemainingTime(startTime: self.currentTime, endTime: self.targetTime, timeUnit: self.selectedCountDownUnit)
             
@@ -116,13 +112,12 @@ struct ContentView: View {
                 case .month:
                     MonthView(minutes: remainingTime.minutes, hours: remainingTime.hours, days: remainingTime.days)
                 case .year:
-                    YearView(hours: remainingTime.hours, days: remainingTime.days, month: remainingTime.month)
+                    YearView(hours: remainingTime.hours, days: remainingTime.days, months: remainingTime.months)
                 }
             }
             
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        //.background(Color.red.opacity(0.3)) // For debugging
         .padding()
         .onReceive(timer) { _ in
             self.currentTime = Date()
@@ -150,16 +145,16 @@ struct ContentView: View {
     ////        1 day = 86400 secs
     ////        1 month = 2629800 secs
     ////        1 year = 31557600
-    private func CalcRemainingTime(startTime initialTime: Date, endTime targetTime: Date, timeUnit unit: CountDownUnit) -> RemaniningTime {
+    private func CalcRemainingTime(startTime initialTime: Date, endTime targetTime: Date, timeUnit unit: CountDownUnit) -> RemainingTime {
         let totalRemainingSec = Int(initialTime.distance(to: targetTime))
         
         let remainingSec = totalRemainingSec % 60
         let remainingMin = (totalRemainingSec % 3600) / 60
         let remainingHours = unit == .day ? totalRemainingSec / 3600 : (totalRemainingSec % 86400) / 3600
-        let remainingDays = calendar.dateComponents([.day], from: initialTime, to: targetTime).day ?? 0
+        let remainingDays = unit == .month ? calendar.dateComponents([.day], from: initialTime, to: targetTime).day ?? 0 : (totalRemainingSec % 2629800) / 86400
         let remainingMonths = calendar.dateComponents([.month], from: initialTime, to:targetTime).month ?? 0
         
-        return RemaniningTime(seconds: remainingSec, minutes: remainingMin, hours: remainingHours, days: remainingDays, month: remainingMonths)
+        return RemainingTime(seconds: remainingSec, minutes: remainingMin, hours: remainingHours, days: remainingDays, months: remainingMonths)
     }
     
 }

@@ -31,16 +31,16 @@ struct MonthView: View{
 struct YearView: View{
     let hours: Int
     let days: Int
-    let month: Int
+    let months: Int
     
     var body: some View {
-        Text("\(self.month) month: \(self.days) days: \(self.hours) hours")
+        Text("\(self.months) month: \(self.days) days: \(self.hours) hours")
     }
 }
 
 #Preview {
     DayView(seconds: 10, minutes: 20, hours: 11)
 //    MonthView(minutes: 20, hours: 11, days: 20)
-//    YearView(hours: 20, days: 15, month: 4)
+//    YearView(hours: 20, days: 15, months: 4)
     
 }
