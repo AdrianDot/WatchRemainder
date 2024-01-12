@@ -12,6 +12,7 @@
 		3A098FA72B46105B004B8B51 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A098FA62B46105B004B8B51 /* ContentView.swift */; };
 		3A098FA92B46105C004B8B51 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 3A098FA82B46105C004B8B51 /* Assets.xcassets */; };
 		3A098FAC2B46105C004B8B51 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 3A098FAB2B46105C004B8B51 /* Preview Assets.xcassets */; };
+		3A1EC4F42B510EB800C70FCE /* TimeUnitViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A1EC4F32B510EB800C70FCE /* TimeUnitViews.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -45,6 +46,7 @@
 		3A098FA62B46105B004B8B51 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		3A098FA82B46105C004B8B51 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		3A098FAB2B46105C004B8B51 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
+		3A1EC4F32B510EB800C70FCE /* TimeUnitViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimeUnitViews.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -80,6 +82,7 @@
 			children = (
 				3A098FA42B46105B004B8B51 /* RemainderApp.swift */,
 				3A098FA62B46105B004B8B51 /* ContentView.swift */,
+				3A1EC4F32B510EB800C70FCE /* TimeUnitViews.swift */,
 				3A098FA82B46105C004B8B51 /* Assets.xcassets */,
 				3A098FAA2B46105C004B8B51 /* Preview Content */,
 			);
@@ -192,6 +195,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				3A1EC4F42B510EB800C70FCE /* TimeUnitViews.swift in Sources */,
 				3A098FA72B46105B004B8B51 /* ContentView.swift in Sources */,
 				3A098FA52B46105B004B8B51 /* RemainderApp.swift in Sources */,
 			);

@@ -9,6 +9,7 @@ import SwiftUI
 
 struct ContentView: View {
     
+    // Available unit to switch between
     enum CountDownUnit: String{
         case day = "Day"
         case month = "Month"
@@ -16,15 +17,11 @@ struct ContentView: View {
     }
     
     // our current time
-    @State private var currentTime = Date()
-    // timer for updating the count
-    let timer = Timer.publish(every: 0.1, on: .main, in: .common).autoconnect()
+    @State private var currentTime = Date() // The current Date reference to be contiusly updated
+    let timer = Timer.publish(every: 0.1, on: .main, in: .common).autoconnect() // Timer for updating the count
+    var calendar = Calendar.current // reference to the user timezone
     
-    
-    let dateFormatter = DateFormatter()
-    var calendar = Calendar.current
-    
-        
+    // Reference to save the users selected time unit
     @State @AppStorage("Selected Count Down Unit") private var selectedCountDownUnitRaw: String = "Day"
     private var selectedCountDownUnit: CountDownUnit{
         get{
@@ -34,6 +31,8 @@ struct ContentView: View {
             selectedCountDownUnitRaw = newValue.rawValue
         }
     }
+    
+    // Calculates the point in time depending on the time unit (e.g. how much time left in the day? -> targetTime is 00:00 the next day)
     private var targetTime: Date{
         get{
             switch selectedCountDownUnit {
@@ -69,28 +68,24 @@ struct ContentView: View {
         }
     }
     
-    
-    // DEBUG: start of struct for different remaining time units
-    private struct remaningDay{
-        var currentTime: Date
-        var targetTime: Date
+    // Data type to contain the remaining time
+    private struct RemaniningTime{
+        var seconds: Int = 0
+        var minutes: Int = 0
+        var hours: Int = 0
+        var days: Int = 0
+        var month: Int = 0
         
-        var remainingSec: Int{
-            Int(currentTime.distance(to: self.targetTime)) % 60
-        }
-        var remaningMin: Int{
-            (Int(currentTime.distance(to: self.targetTime)) % 3600) / 60
-        }
-        var remainingHours: Int{
-            Int(currentTime.distance(to: self.targetTime)) / 3600
+        init(seconds: Int, minutes: Int, hours: Int, days: Int, month: Int) {
+            self.seconds = seconds
+            self.minutes = minutes
+            self.hours = hours
+            self.days = days
+            self.month = month
         }
     }
     
-    
-    
-    
     init() {
-        self.dateFormatter.dateFormat = "HH:mm"
         self.calendar.timeZone = TimeZone.current
     }
     
@@ -112,8 +107,18 @@ struct ContentView: View {
             }
             //.background(Color.blue.opacity(0.3)) // For debugging
             
-            Text("Remaining time is \(self.CalcRemainingTime())")
-                .font(.subheadline)
+            let remainingTime = CalcRemainingTime(startTime: self.currentTime, endTime: self.targetTime, timeUnit: self.selectedCountDownUnit)
+            
+            Group{
+                switch self.selectedCountDownUnit{
+                case .day:
+                    DayView(seconds: remainingTime.seconds , minutes: remainingTime.minutes, hours: remainingTime.hours)
+                case .month:
+                    MonthView(minutes: remainingTime.minutes, hours: remainingTime.hours, days: remainingTime.days)
+                case .year:
+                    YearView(hours: remainingTime.hours, days: remainingTime.days, month: remainingTime.month)
+                }
+            }
             
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -137,38 +142,27 @@ struct ContentView: View {
         }
     }
     
-    func CalcRemainingTime() -> String {
-        let totalRemainingSec = Int(currentTime.distance(to: targetTime))
+    
+    // Calculate the time between the startTime and endTime in second and calculates them according to timeUnit. Return the remaining time in a custom struct
+    // Allows for easy modification if costum date-feature want to be implemented
+    ////        1 min = 60 secs
+    ////        1 hours = 3600 secs
+    ////        1 day = 86400 secs
+    ////        1 month = 2629800 secs
+    ////        1 year = 31557600
+    private func CalcRemainingTime(startTime initialTime: Date, endTime targetTime: Date, timeUnit unit: CountDownUnit) -> RemaniningTime {
+        let totalRemainingSec = Int(initialTime.distance(to: targetTime))
         
-//        1 min = 60 secs
-//        1 hours = 3600 secs
-//        1 day = 86400 secs
-//        month = 2629800 secs
+        let remainingSec = totalRemainingSec % 60
+        let remainingMin = (totalRemainingSec % 3600) / 60
+        let remainingHours = unit == .day ? totalRemainingSec / 3600 : (totalRemainingSec % 86400) / 3600
+        let remainingDays = calendar.dateComponents([.day], from: initialTime, to: targetTime).day ?? 0
+        let remainingMonths = calendar.dateComponents([.month], from: initialTime, to:targetTime).month ?? 0
         
-        // Calculates the remaining time depending on the mode
-        switch selectedCountDownUnit {
-            
-        case .day:
-            let remainingSec = totalRemainingSec % 60
-            let remainingMin = (totalRemainingSec % 3600) / 60
-            let remainingHours = totalRemainingSec / 3600
-            return "\(remainingHours) hours:\(remainingMin) min:\(remainingSec) sec"
-            
-        case .month:
-            let remainingMin = (totalRemainingSec % 3600) / 60
-            let remainingHours = (totalRemainingSec % 86400) / 3600
-            
-            let remainingDays = calendar.dateComponents([.day], from: currentTime, to: targetTime).day ?? (totalRemainingSec % 2629800) / 86400
-            return "\(remainingDays) days:\(remainingHours) hours: \(remainingMin) min"
-            
-        case .year:
-            let remainingHours = (totalRemainingSec % 86400) / 3600
-            let remainingDays = calendar.dateComponents([.day], from: currentTime, to: targetTime).day ?? (totalRemainingSec % 2629800) / 86400
-            let remainingMonths = calendar.dateComponents([.month], from: currentTime, to:targetTime).month ?? (totalRemainingSec % 31557600) / 2629800
-            return " \(remainingMonths) months: \(remainingDays) days: \(remainingHours) hours"
-            }
-        }
+        return RemaniningTime(seconds: remainingSec, minutes: remainingMin, hours: remainingHours, days: remainingDays, month: remainingMonths)
     }
+    
+}
     
 
 
