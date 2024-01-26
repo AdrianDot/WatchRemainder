@@ -2,7 +2,6 @@
 
 <p align="center">
 <img src="https://github.com/AdrianDot/WatchRemainder/raw/master/README_assets/RemainderDemo.gif" width="35%" />
-https://github.com/AdrianDot/WatchRemainder
 </p>
 
 ## Description
@@ -13,7 +12,6 @@ The Remainder Watch App is a SwiftUI-based application designed for Apple Watch.
 ## Features
 - Countdown for days, months, and years.
 - Custom views for displaying time units.
-- Dynamic updating of time using Swift's Combine framework.
 
 ## Requirements
 - iOS 13.0+ / watchOS 6.0+
@@ -23,4 +21,4 @@ The Remainder Watch App is a SwiftUI-based application designed for Apple Watch.
 ## Installation
 Clone the repository:
 ```bash
-git clone https://github.com/[your-username]/remainder-watch-app.git
+git https://github.com/AdrianDot/WatchRemainder.git
