@@ -19,7 +19,7 @@ struct ContentView: View {
     // our current time
     @State private var currentTime = Date() // The current Date reference to be contiusly updated
     private let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect() // Timer for updating the count
-     private var calendar = Calendar.current // reference to the user timezone
+    private var calendar = Calendar.current // reference to the user timezone
     
     // Reference to save the users selected time unit
     @State @AppStorage("Selected Count Down Unit") private var selectedCountDownUnitRaw: String = "Day"
@@ -29,6 +29,19 @@ struct ContentView: View {
         }
         set{
             selectedCountDownUnitRaw = newValue.rawValue
+        }
+    }
+    
+    private var remainingText: String{
+        get{
+            switch selectedCountDownUnit {
+            case .day:
+                return "Today"
+            case .month:
+                return "This Month"
+            case .year:
+                return "This Year"
+            }
         }
     }
     
@@ -89,22 +102,43 @@ struct ContentView: View {
     
     var body: some View {
         
-        VStack {
+        VStack() {
+            
+            // HeaderText Stack
             HStack{
-                Spacer().frame(width: 90)
+                
                 Button(action: {
                     NextCountDownUnit()
-                }) {
-                    Text("\(self.selectedCountDownUnitRaw)")
-                        .background(Color.gray)
+                }){
+                    Text("\(self.remainingText)")
+                        .font(.system(size: 20))
+                        .padding()
+                        .background(Capsule().fill(Color.black))
                         .foregroundColor(.white)
-                        .cornerRadius(40)
-                        .border(Color.white, width: 1)
                 }
+                .buttonStyle(PlainButtonStyle())
+                .overlay(
+                            RoundedRectangle(cornerRadius: 25)
+                                .stroke(Color.white, lineWidth: 1.5)
+                        )
+
+                                        
+                VStack{
+                    Spacer()
+                    Text("remains...")
+                        .font(
+                            .system(
+                                size: 15.0,
+                                weight: .light,
+                                design: .default)
+                        )
+                }
+                Spacer()
             }
             
             let remainingTime = CalcRemainingTime(startTime: self.currentTime, endTime: self.targetTime, timeUnit: self.selectedCountDownUnit)
             
+            // TimeDisplaying-Group
             Group{
                 switch self.selectedCountDownUnit{
                 case .day:
@@ -115,10 +149,7 @@ struct ContentView: View {
                     YearView(hours: remainingTime.hours, days: remainingTime.days, months: remainingTime.months)
                 }
             }
-            
         }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .padding()
         .onReceive(timer) { _ in
             self.currentTime = Date()
         }
@@ -144,7 +175,7 @@ struct ContentView: View {
     ////        1 hours = 3600 secs
     ////        1 day = 86400 secs
     ////        1 month = 2629800 secs
-    ////        1 year = 31557600
+    ////        1 year = 31557600 secs
     private func CalcRemainingTime(startTime initialTime: Date, endTime targetTime: Date, timeUnit unit: CountDownUnit) -> RemainingTime {
         let totalRemainingSec = Int(initialTime.distance(to: targetTime))
         
@@ -158,10 +189,9 @@ struct ContentView: View {
     }
     
 }
-    
 
-
-
-#Preview {
-    ContentView()
+struct ContentView_Previews: PreviewProvider {
+    static var previews: some View {
+        ContentView()
+    }
 }
